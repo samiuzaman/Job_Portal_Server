@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -27,6 +27,9 @@ async function run() {
     await client.connect();
 
     const AllJobCollection = client.db("Job_Portal").collection("Jobs");
+    const JobApplicationCollection = client
+      .db("Job_Portal")
+      .collection("Job_Application");
 
     // Get All Element
     app.get("/jobs", async (req, res) => {
@@ -35,10 +38,27 @@ async function run() {
       res.send(jobs);
     });
     // Get Single Element
-    // app.get("/", async (req, res) => {});
+    app.get("/jobs/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await AllJobCollection.findOne(query);
+      res.send(result);
+    });
 
-    // // Post Client Site to Database
-    // app.post("/", async (req, res) => {});
+    // Get Some Data for email
+    app.get("/job-application", async (req, res) => {
+      const email = req.query.email;
+      const query = { candidate_email: email };
+      const result = await JobApplicationCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // Job Application Apis
+    app.post("/job-application", async (req, res) => {
+      const application = req.body;
+      const result = await JobApplicationCollection.insertOne(application);
+      res.send(result);
+    });
 
     // // Delete for Database
     // app.delete("/", async (req, res) => {});
