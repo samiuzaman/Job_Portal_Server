@@ -26,7 +26,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    
+    const AllJobCollection = client.db("Job_Portal").collection("Jobs");
+
+    // Get All Element
+    app.get("/jobs", async (req, res) => {
+      const cursor = AllJobCollection.find();
+      const jobs = await cursor.toArray();
+      res.send(jobs);
+    });
+    // Get Single Element
+    // app.get("/", async (req, res) => {});
+
+    // // Post Client Site to Database
+    // app.post("/", async (req, res) => {});
+
+    // // Delete for Database
+    // app.delete("/", async (req, res) => {});
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
